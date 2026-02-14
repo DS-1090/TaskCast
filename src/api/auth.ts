@@ -12,7 +12,9 @@ type AuthPreferences = {
 
 function requirePreference(name: string, value: string | undefined): string {
   if (!value) {
-    throw new Error(`Missing ${name}. Set it in Raycast extension preferences.`);
+    throw new Error(
+      `Missing ${name}. Set it in Raycast extension preferences.`,
+    );
   }
   return value;
 }
@@ -82,8 +84,14 @@ async function refreshAccessToken(
 
 export async function getAccessToken(): Promise<string> {
   const preferences = getPreferenceValues<AuthPreferences>();
-  const clientId = requirePreference("googleClientId", preferences.googleClientId);
-  const clientSecret = requirePreference("googleClientSecret", preferences.googleClientSecret);
+  const clientId = requirePreference(
+    "googleClientId",
+    preferences.googleClientId,
+  );
+  const clientSecret = requirePreference(
+    "googleClientSecret",
+    preferences.googleClientSecret,
+  );
   const currentTokenSet = await googleOAuth.getTokens();
 
   if (currentTokenSet?.accessToken) {

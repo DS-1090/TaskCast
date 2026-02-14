@@ -66,7 +66,7 @@ export default function AddTask() {
         const prefix =
           priority === "high" ? "🔴 " : priority === "medium" ? "🟡 " : "🔵 ";
 
-        finalTitle = prefix + trimmedTitle.replace(/^[🔴🟡🔵]\s*/, "");
+        finalTitle = prefix + trimmedTitle.replace(/^[🔴🟡🔵]\s*/u, "");
       } else {
         finalTitle = applyPriority(trimmedTitle);
       }
@@ -134,7 +134,11 @@ export default function AddTask() {
         onChange={setSelectedList}
       >
         {lists.map((list) => (
-          <Form.Dropdown.Item key={list.id} value={list.id} title={list.title} />
+          <Form.Dropdown.Item
+            key={list.id}
+            value={list.id}
+            title={list.title}
+          />
         ))}
       </Form.Dropdown>
     </Form>

@@ -59,7 +59,10 @@ export default function Today() {
       searchBarPlaceholder="Search today's tasks..."
     >
       {!loading && tasks.length === 0 ? (
-        <List.EmptyView title="No Tasks Due Today" description="Enjoy your clear schedule." />
+        <List.EmptyView
+          title="No Tasks Due Today"
+          description="Enjoy your clear schedule."
+        />
       ) : null}
       {tasks.map((t) => (
         <List.Item

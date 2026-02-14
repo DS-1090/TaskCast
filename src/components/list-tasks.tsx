@@ -22,16 +22,14 @@ export default function ListTasks({ listId, listTitle }: Props) {
           (t: GoogleTask) => t.status !== "completed",
         );
 
-        items.sort(
-          (a: GoogleTask, b: GoogleTask) => {
-            const pr = priorityRank(a.title) - priorityRank(b.title);
-            if (pr !== 0) return pr;
+        items.sort((a: GoogleTask, b: GoogleTask) => {
+          const pr = priorityRank(a.title) - priorityRank(b.title);
+          if (pr !== 0) return pr;
 
-            const da = a.due ? new Date(a.due).getTime() : Infinity;
-            const db = b.due ? new Date(b.due).getTime() : Infinity;
-            return da - db;
-          },
-        );
+          const da = a.due ? new Date(a.due).getTime() : Infinity;
+          const db = b.due ? new Date(b.due).getTime() : Infinity;
+          return da - db;
+        });
 
         setTasks(items);
       } catch (error) {
@@ -77,7 +75,10 @@ export default function ListTasks({ listId, listTitle }: Props) {
       searchBarPlaceholder="Search tasks..."
     >
       {!loading && tasks.length === 0 ? (
-        <List.EmptyView title="No Open Tasks" description="All tasks in this list are complete." />
+        <List.EmptyView
+          title="No Open Tasks"
+          description="All tasks in this list are complete."
+        />
       ) : null}
       {tasks.map((t) => (
         <List.Item
@@ -87,7 +88,10 @@ export default function ListTasks({ listId, listTitle }: Props) {
           subtitle={t.due ? new Date(t.due).toDateString() : undefined}
           actions={
             <ActionPanel>
-              <Action title="Mark Complete" onAction={() => onCompleteTask(t)} />
+              <Action
+                title="Mark Complete"
+                onAction={() => onCompleteTask(t)}
+              />
             </ActionPanel>
           }
         />
