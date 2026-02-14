@@ -43,13 +43,10 @@ Create credentials in Google Cloud Console:
 
 `https://raycast.com/redirect?packageName=Extension`
 
-8. Save, then download/copy the OAuth client details.
-9. Add the client ID and client secret in your placeholders in `package.json` under `oauth`:
-- `clientId`
-- `clientSecret`
-- `authorizeUrl`
-- `tokenUrl`
-- `scope`
+8. Save, then copy the OAuth client details.
+9. In Raycast, open this extension's preferences and paste:
+- `Google OAuth Client ID`
+- `Google OAuth Client Secret`
 
 Note:
 - Google settings can take a few minutes to propagate.

@@ -13,9 +13,25 @@
   "platforms": [
     "Windows"
   ],
+  "preferences": [
+    {
+      "name": "googleClientId",
+      "type": "textfield",
+      "required": true,
+      "title": "Google OAuth Client ID",
+      "description": "Client ID from your Google Cloud OAuth app"
+    },
+    {
+      "name": "googleClientSecret",
+      "type": "password",
+      "required": true,
+      "title": "Google OAuth Client Secret",
+      "description": "Client secret from your Google Cloud OAuth app"
+    }
+  ],
   "oauth": {
-    "clientId": CLIENT_ID",
-    "clientSecret": CLIENT_SECRET,
+    "clientId": "GOOGLE_CLIENT_ID_PLACEHOLDER",
+    "clientSecret": "GOOGLE_CLIENT_SECRET_PLACEHOLDER",
     "authorizeUrl": "https://accounts.google.com/o/oauth2/v2/auth",
     "tokenUrl": "https://oauth2.googleapis.com/token",
     "scope": "https://www.googleapis.com/auth/tasks"

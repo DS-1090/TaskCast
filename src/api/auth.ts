@@ -1,12 +1,21 @@
-import { OAuth } from "@raycast/api";
+import { OAuth, getPreferenceValues } from "@raycast/api";
 import fetch from "node-fetch";
 
 const GOOGLE_TASKS_SCOPE = "https://www.googleapis.com/auth/tasks";
-const GOOGLE_CLIENT_ID =
-  CLIENT_ID;
-const GOOGLE_CLIENT_SECRET = CLIENT_SECRET;
 const GOOGLE_AUTHORIZE_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
+
+type AuthPreferences = {
+  googleClientId: string;
+  googleClientSecret: string;
+};
+
+function requirePreference(name: string, value: string | undefined): string {
+  if (!value) {
+    throw new Error(`Missing ${name}. Set it in Raycast extension preferences.`);
+  }
+  return value;
+}
 
 export const googleOAuth = new OAuth.PKCEClient({
   redirectMethod: OAuth.RedirectMethod.Web,
@@ -19,10 +28,12 @@ export const googleOAuth = new OAuth.PKCEClient({
 async function exchangeAuthorizationCode(
   authRequest: OAuth.AuthorizationRequest,
   authorizationCode: string,
+  clientId: string,
+  clientSecret: string,
 ): Promise<OAuth.TokenResponse> {
   const params = new URLSearchParams();
-  params.append("client_id", GOOGLE_CLIENT_ID);
-  params.append("client_secret", GOOGLE_CLIENT_SECRET);
+  params.append("client_id", clientId);
+  params.append("client_secret", clientSecret);
   params.append("code", authorizationCode);
   params.append("code_verifier", authRequest.codeVerifier);
   params.append("grant_type", "authorization_code");
@@ -45,10 +56,12 @@ async function exchangeAuthorizationCode(
 
 async function refreshAccessToken(
   refreshToken: string,
+  clientId: string,
+  clientSecret: string,
 ): Promise<OAuth.TokenResponse> {
   const params = new URLSearchParams();
-  params.append("client_id", GOOGLE_CLIENT_ID);
-  params.append("client_secret", GOOGLE_CLIENT_SECRET);
+  params.append("client_id", clientId);
+  params.append("client_secret", clientSecret);
   params.append("refresh_token", refreshToken);
   params.append("grant_type", "refresh_token");
 
@@ -68,12 +81,19 @@ async function refreshAccessToken(
 }
 
 export async function getAccessToken(): Promise<string> {
+  const preferences = getPreferenceValues<AuthPreferences>();
+  const clientId = requirePreference("googleClientId", preferences.googleClientId);
+  const clientSecret = requirePreference("googleClientSecret", preferences.googleClientSecret);
   const currentTokenSet = await googleOAuth.getTokens();
 
   if (currentTokenSet?.accessToken) {
     if (currentTokenSet.refreshToken && currentTokenSet.isExpired()) {
       try {
-        const refreshed = await refreshAccessToken(currentTokenSet.refreshToken);
+        const refreshed = await refreshAccessToken(
+          currentTokenSet.refreshToken,
+          clientId,
+          clientSecret,
+        );
         await googleOAuth.setTokens(refreshed);
         return refreshed.access_token;
       } catch {
@@ -88,7 +108,7 @@ export async function getAccessToken(): Promise<string> {
 
   const authRequest = await googleOAuth.authorizationRequest({
     endpoint: GOOGLE_AUTHORIZE_URL,
-    clientId: GOOGLE_CLIENT_ID,
+    clientId,
     scope: GOOGLE_TASKS_SCOPE,
     extraParameters: {
       access_type: "offline",
@@ -100,6 +120,8 @@ export async function getAccessToken(): Promise<string> {
   const tokens = await exchangeAuthorizationCode(
     authRequest,
     authorizationCode,
+    clientId,
+    clientSecret,
   );
   await googleOAuth.setTokens(tokens);
   return tokens.access_token;
