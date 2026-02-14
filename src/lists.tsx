@@ -1,10 +1,12 @@
 import { List, ActionPanel, Action, showToast, Toast } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { listTaskLists } from "./api/tasks";
+import { listTaskLists, type GoogleTaskList } from "./api/tasks";
 import ListTasks from "./components/list-tasks";
+import CreateList from "./create-list";
+import { getErrorMessage } from "./lib/errors";
 
 export default function Lists() {
-  const [lists, setLists] = useState<any[]>([]);
+  const [lists, setLists] = useState<GoogleTaskList[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -12,11 +14,11 @@ export default function Lists() {
       try {
         const data = await listTaskLists();
         setLists(data.items || []);
-      } catch (err: any) {
+      } catch (err) {
         await showToast({
           style: Toast.Style.Failure,
           title: "Failed to load lists",
-          message: err.message,
+          message: getErrorMessage(err),
         });
       } finally {
         setLoading(false);
@@ -27,7 +29,22 @@ export default function Lists() {
   }, []);
 
   return (
-    <List isLoading={loading}>
+    <List
+      isLoading={loading}
+      navigationTitle="Task Lists"
+      searchBarPlaceholder="Search lists..."
+    >
+      {!loading && lists.length === 0 ? (
+        <List.EmptyView
+          title="No Lists Yet"
+          description="Create a list to get started."
+          actions={
+            <ActionPanel>
+              <Action.Push title="Create List" target={<CreateList />} />
+            </ActionPanel>
+          }
+        />
+      ) : null}
       {lists.map((list) => (
         <List.Item
           key={list.id}

@@ -1,5 +1,6 @@
 import { showToast, Toast } from "@raycast/api";
 import { getAccessToken } from "./api/auth";
+import { getErrorMessage } from "./lib/errors";
 
 export default async function SignIn() {
   try {
@@ -12,7 +13,7 @@ export default async function SignIn() {
     await showToast({
       style: Toast.Style.Failure,
       title: "Google sign-in failed",
-      message: error instanceof Error ? error.message : String(error),
+      message: getErrorMessage(error),
     });
     throw error;
   }

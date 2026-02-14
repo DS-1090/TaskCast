@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { completeTask, GoogleTask, listTasks } from "../api/tasks";
 import { priorityRank } from "../lib/priority";
 import { Toast, showToast } from "@raycast/api";
+import { getErrorMessage } from "../lib/errors";
 
 type Props = {
   listId: string;
@@ -33,6 +34,12 @@ export default function ListTasks({ listId, listTitle }: Props) {
         );
 
         setTasks(items);
+      } catch (error) {
+        await showToast({
+          style: Toast.Style.Failure,
+          title: "Failed to load tasks",
+          message: getErrorMessage(error),
+        });
       } finally {
         setLoading(false);
       }
@@ -59,15 +66,24 @@ export default function ListTasks({ listId, listTitle }: Props) {
       await showToast({
         style: Toast.Style.Failure,
         title: "Failed to complete task",
+        message: getErrorMessage(e),
       });
     }
   }
   return (
-    <List isLoading={loading} navigationTitle={listTitle}>
+    <List
+      isLoading={loading}
+      navigationTitle={listTitle}
+      searchBarPlaceholder="Search tasks..."
+    >
+      {!loading && tasks.length === 0 ? (
+        <List.EmptyView title="No Open Tasks" description="All tasks in this list are complete." />
+      ) : null}
       {tasks.map((t) => (
         <List.Item
           key={t.id}
           title={t.title}
+          keywords={[t.title]}
           subtitle={t.due ? new Date(t.due).toDateString() : undefined}
           actions={
             <ActionPanel>

@@ -6,14 +6,27 @@ import {
   showToast,
   useNavigation,
 } from "@raycast/api";
+import { useState } from "react";
 import { createList } from "./api/tasks";
+import { getErrorMessage } from "./lib/errors";
 
 export default function CreateList() {
   const { pop } = useNavigation();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function submit(values: { title: string }) {
+    const title = values.title.trim();
+    if (!title) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "List name is required",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
-      await createList(values.title);
+      await createList(title);
 
       await showToast({
         style: Toast.Style.Success,
@@ -25,13 +38,17 @@ export default function CreateList() {
       await showToast({
         style: Toast.Style.Failure,
         title: "Failed to create list",
-        message: error instanceof Error ? error.message : String(error),
+        message: getErrorMessage(error),
       });
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
   return (
     <Form
+      isLoading={isSubmitting}
+      navigationTitle="Create List"
       actions={
         <ActionPanel>
           <Action.SubmitForm title="Create List" onSubmit={submit} />
@@ -41,7 +58,7 @@ export default function CreateList() {
       <Form.TextField
         id="title"
         title="List Name"
-        placeholder="Personal, Work, Errands..."
+        placeholder="Personal, Work, Errands"
       />
     </Form>
   );

@@ -1,7 +1,7 @@
 export type Priority = "high" | "medium" | "low" | undefined;
 
 export function applyPriority(rawTitle: string): string {
-  let title = rawTitle.trim();
+  const title = rawTitle.trim();
 
   if (/(^|\s)(!!!|!high)\b/i.test(title)) {
     return "🔴 " + title.replace(/(!!!|!high)/gi, "").trim();

@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import fetch, { type RequestInit } from "node-fetch";
 import { getAccessToken } from "./auth";
 
 const BASE_URL = "https://tasks.googleapis.com/tasks/v1";
@@ -23,27 +23,50 @@ export type TasksResponse = {
   items?: GoogleTask[];
 };
 
+type GoogleApiErrorPayload = {
+  error?: {
+    code?: number;
+    message?: string;
+    status?: string;
+  };
+};
+
+function parseGoogleApiError(responseText: string): string | undefined {
+  try {
+    const parsed = JSON.parse(responseText) as GoogleApiErrorPayload;
+    return parsed.error?.message;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function googleFetch<T>(
   endpoint: string,
-  options: any = {},
+  options: RequestInit = {},
 ): Promise<T> {
   const token = await getAccessToken();
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+    ...(options.headers || {}),
+  };
 
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      ...(options.headers || {}),
-    },
+    headers,
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Google API Error: ${res.status} - ${text}`);
+  if (res.ok) {
+    if (res.status === 204) {
+      return {} as T;
+    }
+    return (await res.json()) as T;
   }
 
-  return (await res.json()) as T;
+  const text = await res.text();
+  const parsedMessage = parseGoogleApiError(text);
+  const errorMessage = parsedMessage ?? text;
+  throw new Error(`Google API Error (${res.status}): ${errorMessage}`);
 }
 
 export async function listTaskLists(): Promise<TaskListsResponse> {
@@ -59,7 +82,7 @@ export async function createTask(
   title: string,
   due?: Date,
 ): Promise<GoogleTask> {
-  const body: any = { title };
+  const body: { title: string; due?: string } = { title };
 
   if (due) {
     body.due = due.toISOString(); // Google expects RFC3339

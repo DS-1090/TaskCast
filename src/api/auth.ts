@@ -58,10 +58,8 @@ async function refreshAccessToken(
   });
 
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(
-      `Error while refreshing tokens: ${response.status} (${response.statusText})\n${text}`,
-    );
+    await googleOAuth.removeTokens();
+    throw new Error("Session expired. Please sign in to Google again.");
   }
 
   const tokenResponse = (await response.json()) as OAuth.TokenResponse;
@@ -74,12 +72,18 @@ export async function getAccessToken(): Promise<string> {
 
   if (currentTokenSet?.accessToken) {
     if (currentTokenSet.refreshToken && currentTokenSet.isExpired()) {
-      const refreshed = await refreshAccessToken(currentTokenSet.refreshToken);
-      await googleOAuth.setTokens(refreshed);
-      return refreshed.access_token;
+      try {
+        const refreshed = await refreshAccessToken(currentTokenSet.refreshToken);
+        await googleOAuth.setTokens(refreshed);
+        return refreshed.access_token;
+      } catch {
+        // Fall through to a fresh authorization flow.
+      }
     }
 
-    return currentTokenSet.accessToken;
+    if (!currentTokenSet.isExpired()) {
+      return currentTokenSet.accessToken;
+    }
   }
 
   const authRequest = await googleOAuth.authorizationRequest({
