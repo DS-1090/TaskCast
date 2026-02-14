@@ -14,8 +14,8 @@
     "Windows"
   ],
   "oauth": {
-    "clientId": "27436580480-h8odgn8oiushufm5t383rgqng2c1tl0u.apps.googleusercontent.com",
-    "clientSecret": "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",
+    "clientId": CLIENT_ID",
+    "clientSecret": CLIENT_SECRET,
     "authorizeUrl": "https://accounts.google.com/o/oauth2/v2/auth",
     "tokenUrl": "https://oauth2.googleapis.com/token",
     "scope": "https://www.googleapis.com/auth/tasks"
