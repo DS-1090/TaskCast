@@ -3,8 +3,8 @@ import fetch from "node-fetch";
 
 const GOOGLE_TASKS_SCOPE = "https://www.googleapis.com/auth/tasks";
 const GOOGLE_CLIENT_ID =
-  "27436580480-h8odgn8oiushufm5t383rgqng2c1tl0u.apps.googleusercontent.com";
-const GOOGLE_CLIENT_SECRET = "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";
+  CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = CLIENT_SECRET;
 const GOOGLE_AUTHORIZE_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 
