@@ -33,30 +33,29 @@ npm run dev
 
 Create credentials in Google Cloud Console:
 
-1. Create a new Google Cloud project.
-2. Go to `APIs & Services`.
-3. Click `Enable APIs and Services`, search for `Google Tasks API`, and enable it.
-4. Go to `Credentials`.
-5. Click `Create Credentials` -> `OAuth client ID`.
-6. Select `Web application`.
-7. Add this redirect URI:
+1. Create a new project in **Google Cloud Console**.
+2. Navigate to **APIs & Services**.
+3. Click **Enable APIs and Services**, search for **Google Tasks API**, and enable it.
+   [https://console.cloud.google.com/apis/library/tasks.googleapis.com](https://console.cloud.google.com/apis/library/tasks.googleapis.com)
 
-`https://raycast.com/redirect?packageName=Extension`
+4. Ensure the OAuth scope includes:
+   `https://www.googleapis.com/auth/tasks`
+5. Go to **Credentials**.
+6. Click **Create Credentials → OAuth client ID**.
+7. Choose **Web application** as the application type.
+8. Add the following redirect URI:
+   ```
+   https://raycast.com/redirect?packageName=Extension
+   ```
+9. Save the configuration and copy the generated **Client ID** and **Client Secret**.
+10. In Raycast, open this extension’s **Preferences** and paste:
+* Google OAuth Client ID
+* Google OAuth Client Secret
 
-8. Save, then copy the OAuth client details.
-9. In Raycast, open this extension's preferences and paste:
-- `Google OAuth Client ID`
-- `Google OAuth Client Secret`
 
 Note:
 - Google settings can take a few minutes to propagate.
 - A mismatch in redirect URI will cause `Error 400: redirect_uri_mismatch`.
-
-## Security Notes
-
-- Do not commit production OAuth credentials to public repositories.
-- Rotate client secrets immediately if exposed.
-- Prefer using dedicated dev credentials for local testing.
 
 ## Commands
 
